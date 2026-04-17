@@ -1,0 +1,24 @@
+TITLE: Zoom Meeting History
+DATE: 2026-04-16T16:27:02.615471
+================================================================================
+
+ZOOM MEETING: Discuss AI value for Dashboard
+Date: 2026-04-01
+Participants: 
+Summary: Meeting analysis unavailable.
+Transcript excerpt: [Unknown]
+using now the created Claude versus snowflake connector. Right? Claude connects to Snowflake directly, but the problem is it's not as scalable as normal dashboard development, but still, they were asking me to investigate building cloud dashboards.
+using Power BI semantic layer, because po
+────────────────────────────────────────
+ZOOM MEETING: Discuss feedback on SlideVertex
+Date: 2026-03-03
+Participants: 
+Summary: Christine will take the feedback to the team and get back on when they will improve on the product.
+Action Items:
+  - [Christine] write instructions differently for some of these, but… you know, because Claude can't do this today either right with these multiple things.
+Decisions:
+  - to improve the product
+Transcript excerpt: [Unknown]
+of work on automated Powerpoint outputs using another application that we have, which is ecosystem. So that's a DT supported product for sellers.
+And… you know, I've so I'm familiar with kind of the approach that, you know, like what you have to do when you're structuring it, and how you h
+────────────────────────────────────────

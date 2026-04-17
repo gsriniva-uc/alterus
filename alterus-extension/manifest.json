@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "Alterus — Your AI Digital Twin",
+  "version": "1.0.0",
+  "description": "Draft emails, chats, and replies in your voice. Works on Gmail, Outlook, Slack, and Teams.",
+
+  "permissions": [
+    "storage",
+    "identity",
+    "scripting",
+    "activeTab"
+  ],
+
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "https://outlook.office.com/*",
+    "https://outlook.live.com/*",
+    "https://app.slack.com/*",
+    "https://teams.microsoft.com/*",
+    "https://YOUR_RAILWAY_APP.up.railway.app/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://outlook.office.com/*",
+        "https://outlook.live.com/*",
+        "https://app.slack.com/*",
+        "https://teams.microsoft.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["sidebar.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "oauth2": {
+    "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.readonly",
+      "https://www.googleapis.com/auth/gmail.compose",
+      "https://www.googleapis.com/auth/calendar.readonly"
+    ]
+  }
+}

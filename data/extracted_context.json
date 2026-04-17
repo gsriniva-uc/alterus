@@ -1,0 +1,60 @@
+{
+  "extracted_at": "2026-04-16T16:27:17.316769",
+  "workstreams": [
+    {
+      "name": "Customer Engine",
+      "tag": "active",
+      "tag_label": "\ud83d\udfe2 Active",
+      "description": "NBA renewal recommendations agent. Semantic router fix deployed.",
+      "owner": "Sibanjan Das",
+      "stakeholder": "Jason Wong"
+    },
+    {
+      "name": "Feature Store",
+      "tag": "active",
+      "tag_label": "\ud83d\udfe2 Active",
+      "description": "White paper complete. Implementation planning with D&A.",
+      "owner": "Senthil V.",
+      "stakeholder": "Raghu"
+    },
+    {
+      "name": "CCX Skill Builder",
+      "tag": "active",
+      "tag_label": "\ud83d\udfe2 Active",
+      "description": "5-stage agent pipeline. Pending CCX governance sign-off.",
+      "owner": "Jerry Jiang",
+      "stakeholder": "Jason Wong"
+    }
+  ],
+  "stakeholders": [
+    {
+      "name": "Senthil",
+      "role": "Partner Team VP",
+      "last": "unknown",
+      "pending": "consulting support to review their ML model",
+      "notes": "engagement with external partners, ZTSD"
+    },
+    {
+      "name": "Tony",
+      "role": "ZTSD",
+      "last": "unknown",
+      "pending": "review of ML model",
+      "notes": "consulting support"
+    },
+    {
+      "name": "Jason",
+      "role": "ZTSD",
+      "last": "unknown",
+      "pending": "review of ML model",
+      "notes": "consulting support"
+    }
+  ],
+  "topics": [
+    "LangGraph multi-agent systems",
+    "enterprise AI platform ServiceNow",
+    "RAG retrieval augmented generation",
+    "AI product management strategy",
+    "agentic AI orchestration"
+  ],
+  "news_query": "LangGraph+multi-agent+systems+enterprise+AI+platform+ServiceNow+RAG+retrieval+augmented+generation"
+}
