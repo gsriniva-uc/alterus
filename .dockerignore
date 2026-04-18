@@ -1,0 +1,15 @@
+.env
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+data/chroma_db/
+data/claude_conversations/
+data/outlook_raw.json
+data/outlook_history.txt
+logs/
+node_modules/
+alterus-extension/
+healing/
+*.pptx
+.git/
