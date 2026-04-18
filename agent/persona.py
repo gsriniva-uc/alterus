@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from retrieval.retriever import Retriever
 
 def build_system_prompt(task_type: str = "email", user_config: dict = None) -> str:
     """
@@ -41,17 +40,8 @@ def build_system_prompt(task_type: str = "email", user_config: dict = None) -> s
             stakeholders = []
             tone         = "balanced"
 
-    # Try to get style examples from corpus
+    # Corpus retrieval disabled for beta
     style_examples = ""
-    try:
-        retriever = Retriever()
-        results   = retriever.search(f"{task_type} writing style examples", top_k=2)
-        if results:
-            style_examples = "\n\nSTYLE EXAMPLES FROM YOUR PAST WRITING:\n"
-            for r in results[:2]:
-                style_examples += f"---\n{r['text'][:300]}\n"
-    except Exception:
-        pass
 
     # Tone instruction
     tone_map = {
