@@ -423,21 +423,8 @@ async def api_draft(request: Request):
         # Get user_id for per-user corpus (use email if available, else name)
         user_id = data.get("user_email") or user_name.lower().replace(" ","_") or "default"
 
-        # Retrieve relevant history from user's personal corpus
+        # Corpus retrieval disabled for beta (memory constraints)
         history_context = ""
-        try:
-            retriever = Retriever(user_id=user_id)
-            results   = retriever.multi_search([
-                f"email {sender} conversation history",
-                f"{subject} previous discussion",
-            ], top_k=3)
-            if results:
-                history_context = "\n\nRELEVANT PAST CONTEXT:\n"
-                history_context += "\n---\n".join(
-                    r["text"][:300] for r in results[:3]
-                )
-        except Exception:
-            pass
 
         user_message  = f"""DRAFT A REPLY FOR {user_name or "the user"}.
 
