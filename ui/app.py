@@ -23,6 +23,8 @@ from agent.corpus_extractor import get_context
 from agent.classifier import batch_analyze_messages, analyze_sentiment
 from agent.prioritizer import prioritize_emails, prioritize_calendar, score_email
 from agent.feedback import log_feedback, run_batch_healer, load_local_feedback
+from config import (USER_NAME, USER_TITLE, USER_COMPANY, USER_LOCATION,
+                    USER_STAKEHOLDERS, USER_TONE, get_persona_summary, is_configured)
 from channels.zoom_watcher import scan_zoom_folder, load_meeting_transcript, get_new_meetings, load_meetings_cache
 from agent.transcript_analyzer import process_all_new_meetings, process_meeting
 from channels.webhook_server import load_json, INBOX_FILE, TEAMS_FILE, CALENDAR_FILE
@@ -607,7 +609,7 @@ st.markdown(f"""
 <div class="g-header">
   <div>
     <div class="g-htitle">🤖 Alterus</div>
-    <div class="g-hsub">Principal PM · EAI · ServiceNow · Boston</div>
+    <div class="g-hsub">{USER_TITLE} · {USER_COMPANY} · {USER_LOCATION}</div>
   </div>
   <div style="text-align:right;font-size:11px;color:#3a3f55;font-family:'DM Mono',monospace;">
     <span class="dot-online"></span>online &nbsp;·&nbsp;
@@ -1853,3 +1855,4 @@ st.markdown(
     "</div>",
     unsafe_allow_html=True
 )
+

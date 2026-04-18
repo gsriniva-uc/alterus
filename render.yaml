@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: alterus
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run ui/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    envVars:
+      - key: USER_NAME
+        value: Your Name
+      - key: USER_TITLE
+        value: Your Title
+      - key: USER_COMPANY
+        value: Your Company
+      - key: USER_STAKEHOLDERS
+        value: Person One,Person Two,Person Three
+      - key: USER_TONE
+        value: balanced
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.0

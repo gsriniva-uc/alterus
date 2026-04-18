@@ -1,20 +1,31 @@
 """
 drafter.py
-Generates drafts using Ollama llama3.2 (local, free).
-Takes system prompt from persona.py + retrieved context + input message.
+Generates drafts using either:
+  - Anthropic Claude API (cloud, recommended for Railway)
+  - Ollama llama3.2 (local, for development on MacBook)
+
+Set ANTHROPIC_API_KEY in .env to use Claude.
+Falls back to Ollama automatically if key not set.
 """
 
+import os
 import sys
 import requests
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # ── Config ────────────────────────────────────────────────────────────────────
-OLLAMA_URL   = "http://localhost:11434/api/generate"
-OLLAMA_CHAT  = "http://localhost:11434/api/chat"
-LLM_MODEL    = "llama3.2"
-TEMPERATURE  = 0.7
-MAX_TOKENS   = 2048
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+OLLAMA_URL        = "http://localhost:11434/api/chat"
+OLLAMA_MODEL      = "llama3.2"
+CLAUDE_MODEL      = "claude-sonnet-4-5"
+TEMPERATURE       = 0.7
+MAX_TOKENS        = 2048
+
+USE_CLAUDE = bool(ANTHROPIC_API_KEY and ANTHROPIC_API_KEY.startswith("sk-ant-"))
 
 
 def generate(
@@ -23,86 +34,55 @@ def generate(
     temperature:   float = TEMPERATURE,
 ) -> str:
     """
-    Generate a response using Ollama llama3.2.
-    Uses chat endpoint for proper system/user role separation.
+    Generate a response using Claude API (cloud) or Ollama (local).
+    Automatically picks Claude if ANTHROPIC_API_KEY is set.
     """
-    payload = {
-        "model":  LLM_MODEL,
-        "stream": False,
-        "options": {
-            "temperature": temperature,
-            "num_predict": MAX_TOKENS,
-        },
-        "messages": [
-            {"role": "system",  "content": system_prompt},
-            {"role": "user",    "content": user_message},
-        ]
-    }
+    if USE_CLAUDE:
+        return _generate_claude(system_prompt, user_message, temperature)
+    else:
+        return _generate_ollama(system_prompt, user_message, temperature)
 
+
+def _generate_claude(system_prompt: str, user_message: str, temperature: float) -> str:
+    """Generate using Anthropic Claude API."""
     try:
-        resp = requests.post(OLLAMA_CHAT, json=payload, timeout=120)
-        resp.raise_for_status()
-        return resp.json()["message"]["content"].strip()
-    except requests.exceptions.Timeout:
-        return "ERROR: LLM timed out. Try again."
+        import anthropic
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        message = client.messages.create(
+            model      = CLAUDE_MODEL,
+            max_tokens = MAX_TOKENS,
+            system     = system_prompt,
+            messages   = [{"role": "user", "content": user_message}],
+        )
+        return message.content[0].text
     except Exception as e:
-        return f"ERROR: {e}"
+        print(f"Claude API error: {e} — falling back to Ollama")
+        return _generate_ollama(system_prompt, user_message, temperature)
 
 
-def draft_response(
-    input_text:    str,
-    system_prompt: str,
-    context:       str = "",
-    task_type:     str = "reply",
-) -> str:
-    """
-    Generate a draft response in Ganesh's voice.
-    Combines input, retrieved context, and task instructions.
-    """
-    user_message = f"""
-INPUT MESSAGE / TASK:
-{input_text}
-
-RETRIEVED CONTEXT FROM YOUR PAST WORK:
-{context if context else "No specific context retrieved."}
-
-INSTRUCTIONS:
-Based on the above, draft a {task_type} in Ganesh's voice.
-Use the retrieved context to match tone, style, and relevant details.
-Be direct, clear, and action-oriented.
-Do not add unnecessary preamble — just write the draft.
-""".strip()
-
-    return generate(system_prompt, user_message)
-
-
-def check_ollama() -> bool:
-    """Verify Ollama is running with llama3.2."""
+def _generate_ollama(system_prompt: str, user_message: str, temperature: float) -> str:
+    """Generate using local Ollama."""
     try:
-        resp   = requests.get("http://localhost:11434/api/tags", timeout=5)
-        models = [m["name"] for m in resp.json().get("models", [])]
-        if not any("llama3.2" in m for m in models):
-            print("❌ llama3.2 not found. Run: ollama pull llama3.2")
-            return False
-        return True
-    except Exception:
-        print("❌ Ollama not running. Start: ollama serve")
-        return False
+        payload = {
+            "model":  OLLAMA_MODEL,
+            "stream": False,
+            "options": {"temperature": temperature, "num_predict": MAX_TOKENS},
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_message},
+            ]
+        }
+        resp = requests.post(OLLAMA_URL, json=payload, timeout=120)
+        resp.raise_for_status()
+        return resp.json()["message"]["content"]
+    except Exception as e:
+        return f"[Draft unavailable — LLM error: {e}]"
 
 
-# ── Quick test ────────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    if not check_ollama():
-        exit(1)
-
-    from agent.persona import build_system_prompt
-
-    print("── Test: Draft email to VP ───────────────────")
-    system = build_system_prompt("email")
-    draft  = draft_response(
-        input_text  = "Jason Wong asked for a quick status update on Customer Engine",
-        system_prompt = system,
-        task_type   = "email",
-    )
-    print(draft)
+# ── Model info helper ─────────────────────────────────────────────────────────
+def get_model_info() -> dict:
+    return {
+        "model":    CLAUDE_MODEL if USE_CLAUDE else OLLAMA_MODEL,
+        "provider": "Claude API" if USE_CLAUDE else "Ollama (local)",
+        "status":   "✅ connected" if USE_CLAUDE else "🟡 local only",
+    }

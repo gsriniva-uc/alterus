@@ -8,224 +8,193 @@
     width: 280px;
     background: #06080F;
     color: #EEF0FF;
-    font-family: -apple-system, BlinkMacSystemFont, 'DM Sans', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 13px;
   }
-
-  .header {
-    padding: 16px;
-    border-bottom: 1px solid #1E2235;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .logo {
-    font-family: Georgia, serif;
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-  }
-  .version {
-    font-size: 10px;
-    color: #475569;
-    font-family: monospace;
-  }
-
-  .section {
+  .hdr {
     padding: 14px 16px;
     border-bottom: 1px solid #1E2235;
-  }
-  .section-title {
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #475569;
-    margin-bottom: 10px;
-    font-family: monospace;
-  }
-
-  input[type="text"] {
-    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
     background: #0A0D1A;
-    border: 1px solid #1E2235;
-    border-radius: 4px;
-    color: #EEF0FF;
-    padding: 7px 10px;
-    font-size: 12px;
-    font-family: inherit;
-    outline: none;
-    margin-bottom: 6px;
-    transition: border-color 0.2s;
   }
-  input[type="text"]:focus { border-color: #6366F1; }
-  input[type="text"]::placeholder { color: #475569; }
+  .logo { font-size: 17px; font-weight: 600; letter-spacing: 0.08em; }
+  .ver  { font-size: 10px; color: #475569; }
 
-  .label {
-    font-size: 11px;
-    color: #64748B;
-    margin-bottom: 4px;
-    display: block;
+  .sec { padding: 14px 16px; border-bottom: 1px solid #1E2235; }
+  .sec-title {
+    font-size: 9px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: #475569;
+    margin-bottom: 10px;
   }
+
+  label { font-size: 11px; color: #64748B; display: block; margin-bottom: 3px; }
+  input {
+    width: 100%; background: #0A0D1A;
+    border: 1px solid #1E2235; border-radius: 4px;
+    color: #EEF0FF; padding: 7px 10px;
+    font-size: 12px; outline: none;
+    margin-bottom: 8px; transition: border-color 0.2s;
+  }
+  input:focus { border-color: #6366F1; }
+  input::placeholder { color: #475569; }
+
+  .btn {
+    width: 100%; padding: 9px;
+    background: #6366F1; border: none;
+    border-radius: 4px; color: white;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn:hover { background: #818CF8; }
+  .saved { font-size: 11px; color: #22C55E; text-align: center; margin-top: 6px; min-height: 16px; }
 
   .status-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 0;
+    display: flex; align-items: center;
+    justify-content: space-between; padding: 5px 0;
   }
   .status-name { font-size: 12px; color: #94A3B8; }
-  .status-badge {
-    font-size: 10px;
-    padding: 2px 8px;
+  .badge {
+    font-size: 9px; padding: 2px 8px;
     border-radius: 10px;
-    font-family: monospace;
   }
-  .status-badge.connected { background: rgba(34,197,94,0.15); color: #22C55E; }
-  .status-badge.disconnected { background: rgba(71,85,105,0.2); color: #475569; }
+  .badge.on  { background: rgba(34,197,94,0.15); color: #22C55E; }
+  .badge.off { background: rgba(71,85,105,0.15); color: #475569; }
 
-  .save-btn {
-    width: 100%;
-    padding: 9px;
-    background: #6366F1;
-    border: none;
-    border-radius: 4px;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.2s;
-    margin-top: 8px;
+  .test-btn {
+    width: 100%; padding: 7px;
+    background: transparent; border: 1px solid #1E2235;
+    border-radius: 4px; color: #64748B;
+    font-size: 11px; cursor: pointer;
+    margin-top: 8px; transition: all 0.2s;
   }
-  .save-btn:hover { background: #818CF8; }
+  .test-btn:hover { border-color: #6366F1; color: #818CF8; }
 
-  .footer {
-    padding: 10px 16px;
-    font-size: 10px;
-    color: #1E2235;
-    text-align: center;
-    font-family: monospace;
-  }
-
-  .saved-msg {
-    font-size: 11px;
-    color: #22C55E;
-    text-align: center;
-    margin-top: 6px;
-    min-height: 16px;
-    font-family: monospace;
+  .foot {
+    padding: 10px 16px; font-size: 10px;
+    color: #1E2235; text-align: center;
   }
 </style>
 </head>
 <body>
 
-<div class="header">
+<div class="hdr">
   <span class="logo">✦ Alterus</span>
-  <span class="version">v1.0</span>
+  <span class="ver">v1.0</span>
 </div>
 
-<!-- User Setup -->
-<div class="section">
-  <div class="section-title">Your Profile</div>
-  <label class="label">Your name</label>
-  <input type="text" id="userName" placeholder="e.g. Sarah Chen">
-  <label class="label">Your role</label>
-  <input type="text" id="userRole" placeholder="e.g. VP of Product">
-  <label class="label">Your company</label>
-  <input type="text" id="userCompany" placeholder="e.g. Acme Corp">
-  <label class="label">Key contacts (comma separated)</label>
-  <input type="text" id="userStakeholders" placeholder="e.g. John Smith, Amy Lee, Bob Chen">
-  <button class="save-btn" id="saveBtn">Save Profile</button>
-  <div class="saved-msg" id="savedMsg"></div>
+<!-- Profile -->
+<div class="sec">
+  <div class="sec-title">Your Profile</div>
+  <label>Your name *</label>
+  <input id="name" placeholder="Sarah Chen" />
+  <label>Work email (used to keep your data private)</label>
+  <input id="email" placeholder="you@company.com" type="email" />
+  <label>Role</label>
+  <input id="role" placeholder="VP of Product" />
+  <label>Company</label>
+  <input id="company" placeholder="Acme Corp" />
+  <label>Key contacts (comma separated)</label>
+  <input id="stakeholders" placeholder="John Smith, Amy Lee, Bob Chen" />
+  <button class="btn" id="saveBtn">Save Profile</button>
+  <div class="saved" id="savedMsg"></div>
 </div>
 
-<!-- Connection Status -->
-<div class="section">
-  <div class="section-title">Connected Accounts</div>
+<!-- API URL -->
+<div class="sec">
+  <div class="sec-title">Server URL</div>
+  <label>Alterus API URL</label>
+  <input id="apiUrl" placeholder="https://alterus.onrender.com" />
+  <button class="test-btn" id="testBtn">Test Connection</button>
+  <div class="saved" id="testMsg"></div>
+</div>
+
+<!-- Status -->
+<div class="sec">
+  <div class="sec-title">Connected Accounts</div>
   <div class="status-row">
     <span class="status-name">Gmail</span>
-    <span class="status-badge disconnected" id="gmailStatus">Not connected</span>
+    <span class="badge off" id="gmailBadge">Not connected</span>
   </div>
   <div class="status-row">
     <span class="status-name">Slack</span>
-    <span class="status-badge disconnected" id="slackStatus">Not connected</span>
+    <span class="badge off" id="slackBadge">Not connected</span>
   </div>
   <div class="status-row">
-    <span class="status-name">Outlook (scraping)</span>
-    <span class="status-badge disconnected" id="outlookStatus">Not started</span>
+    <span class="status-name">Outlook history</span>
+    <span class="badge off" id="outlookBadge">0 emails</span>
   </div>
   <div class="status-row">
-    <span class="status-name">Teams (scraping)</span>
-    <span class="status-badge disconnected" id="teamsStatus">Not started</span>
+    <span class="status-name">Teams history</span>
+    <span class="badge off" id="teamsBadge">0 messages</span>
   </div>
 </div>
 
-<!-- History stats -->
-<div class="section">
-  <div class="section-title">Corpus Status</div>
-  <div class="status-row">
-    <span class="status-name">Emails learned</span>
-    <span class="status-badge connected" id="emailCount">0</span>
-  </div>
-  <div class="status-row">
-    <span class="status-name">Chat messages</span>
-    <span class="status-badge connected" id="chatCount">0</span>
-  </div>
-</div>
-
-<div class="footer">alterus.io · Your AI Digital Twin</div>
+<div class="foot">alterus.io · Your AI Digital Twin</div>
 
 <script>
-  // Load saved config
-  chrome.storage.local.get([
-    'userConfig', 'gmailConnected', 'slackConnected',
-    'gmailHistory', 'slackHistory', 'outlookHistory', 'teamsHistory'
-  ], data => {
-    if (data.userConfig) {
-      document.getElementById('userName').value         = data.userConfig.name || '';
-      document.getElementById('userRole').value         = data.userConfig.role || '';
-      document.getElementById('userCompany').value      = data.userConfig.company || '';
-      document.getElementById('userStakeholders').value = (data.userConfig.stakeholders || []).join(', ');
-    }
+// Load saved values
+chrome.storage.local.get(['userConfig','alterusApiUrl',
+  'gmailConnected','slackConnected','gmailHistory',
+  'outlookHistory','teamsHistory'], d => {
 
-    // Connection status
-    if (data.gmailConnected) setBadge('gmailStatus', 'Connected', true);
-    if (data.slackConnected) setBadge('slackStatus', 'Connected', true);
-
-    const outlookCount = (data.outlookHistory || []).length;
-    const teamsCount   = (data.teamsHistory || []).length;
-    if (outlookCount > 0) setBadge('outlookStatus', `${outlookCount} emails`, true);
-    if (teamsCount > 0)   setBadge('teamsStatus',   `${teamsCount} msgs`, true);
-
-    // Corpus counts
-    const emailCount = (data.gmailHistory || []).length + outlookCount;
-    const chatCount  = (data.slackHistory || []).length + teamsCount;
-    document.getElementById('emailCount').textContent = emailCount;
-    document.getElementById('chatCount').textContent  = chatCount;
-  });
-
-  // Save profile
-  document.getElementById('saveBtn').addEventListener('click', () => {
-    const name = document.getElementById('userName').value.trim();
-    const role = document.getElementById('userRole').value.trim();
-    const company = document.getElementById('userCompany').value.trim();
-    const stakeholders = document.getElementById('userStakeholders').value
-      .split(',').map(s => s.trim()).filter(Boolean);
-
-    chrome.storage.local.set({
-      userConfig: { name, role, company, stakeholders }
-    }, () => {
-      const msg = document.getElementById('savedMsg');
-      msg.textContent = '✓ Profile saved';
-      setTimeout(() => { msg.textContent = ''; }, 2000);
-    });
-  });
-
-  function setBadge(id, text, connected) {
-    const el = document.getElementById(id);
-    el.textContent = text;
-    el.className   = `status-badge ${connected ? 'connected' : 'disconnected'}`;
+  if (d.userConfig) {
+    document.getElementById('name').value         = d.userConfig.name || '';
+    document.getElementById('email').value        = d.userConfig.email || '';
+    document.getElementById('role').value         = d.userConfig.role || '';
+    document.getElementById('company').value      = d.userConfig.company || '';
+    document.getElementById('stakeholders').value = (d.userConfig.stakeholders || []).join(', ');
   }
+
+  document.getElementById('apiUrl').value =
+    d.alterusApiUrl || 'https://alterus.onrender.com';
+
+  if (d.gmailConnected) setBadge('gmailBadge', 'Connected', true);
+  if (d.slackConnected) setBadge('slackBadge', 'Connected', true);
+
+  const oc = (d.outlookHistory || []).length;
+  const tc = (d.teamsHistory || []).length;
+  if (oc > 0) setBadge('outlookBadge', `${oc} emails`, true);
+  if (tc > 0) setBadge('teamsBadge',   `${tc} messages`, true);
+});
+
+// Save profile
+document.getElementById('saveBtn').onclick = () => {
+  const config = {
+    name:         document.getElementById('name').value.trim(),
+    email:        document.getElementById('email').value.trim(),
+    role:         document.getElementById('role').value.trim(),
+    company:      document.getElementById('company').value.trim(),
+    stakeholders: document.getElementById('stakeholders').value
+                    .split(',').map(s => s.trim()).filter(Boolean),
+  };
+  const apiUrl = document.getElementById('apiUrl').value.trim();
+  chrome.storage.local.set({ userConfig: config, alterusApiUrl: apiUrl }, () => {
+    show('savedMsg', '✓ Saved!');
+  });
+};
+
+// Test connection
+document.getElementById('testBtn').onclick = () => {
+  const url = document.getElementById('apiUrl').value.trim();
+  chrome.storage.local.set({ alterusApiUrl: url });
+  document.getElementById('testMsg').textContent = '⏳ Testing...';
+  chrome.runtime.sendMessage({ action: 'testConnection' }, res => {
+    if (res?.ok) show('testMsg', '✅ Connected!');
+    else show('testMsg', `❌ Failed: ${res?.error || 'unreachable'}`);
+  });
+};
+
+function setBadge(id, text, on) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className   = `badge ${on ? 'on' : 'off'}`;
+}
+
+function show(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ''; }, 3000);
+}
 </script>
 </body>
 </html>

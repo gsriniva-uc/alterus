@@ -1,30 +1,55 @@
-/* sidebar.css — Alterus extension sidebar styles */
+/* Alterus Extension Sidebar */
 
 #alterus-sidebar {
   position: fixed;
-  top: 0;
-  right: -360px;
-  width: 340px;
+  top: 0; right: 0;
+  width: 320px;
+  height: 100vh;
+  z-index: 2147483647;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* Toggle tab */
+#al-tab {
+  position: fixed;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  background: #6366F1;
+  color: white;
+  padding: 14px 7px;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  font-size: 16px;
+  pointer-events: all;
+  z-index: 2147483647;
+  transition: background 0.2s, right 0.3s;
+  user-select: none;
+  box-shadow: -4px 0 16px rgba(99,102,241,0.3);
+}
+#al-tab:hover { background: #818CF8; }
+
+/* Panel */
+#al-panel {
+  position: fixed;
+  top: 0; right: -340px;
+  width: 320px;
   height: 100vh;
   background: #06080F;
   border-left: 1px solid #1E2235;
-  z-index: 999999;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 13px;
-  color: #EEF0FF;
+  box-shadow: -8px 0 32px rgba(0,0,0,0.5);
   transition: right 0.3s ease;
+  pointer-events: all;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0,0,0,0.4);
   overflow: hidden;
 }
-
-#alterus-sidebar.visible {
-  right: 0;
-}
+#al-panel.open { right: 0; }
+#al-panel.open ~ #al-tab { right: 320px; }
 
 /* Header */
-#alterus-header {
+#al-head {
   display: flex;
   align-items: center;
   padding: 14px 16px;
@@ -32,261 +57,152 @@
   background: #0A0D1A;
   flex-shrink: 0;
 }
-
-#alterus-logo {
-  font-family: Georgia, serif;
-  font-size: 16px;
+#al-logo {
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: #EEF0FF;
   flex: 1;
 }
-
-#alterus-platform {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  color: #6366F1;
-  letter-spacing: 0.1em;
+#al-plat {
+  font-size: 9px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  background: rgba(99,102,241,0.1);
-  padding: 3px 8px;
+  color: #6366F1;
+  background: rgba(99,102,241,0.12);
+  padding: 2px 8px;
   border-radius: 10px;
   margin-right: 8px;
 }
-
-#alterus-close {
-  background: none;
-  border: none;
-  color: #475569;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px;
-  transition: color 0.2s;
+#al-close {
+  background: none; border: none;
+  color: #475569; cursor: pointer;
+  font-size: 14px; padding: 4px;
 }
-#alterus-close:hover { color: #EEF0FF; }
+#al-close:hover { color: #EEF0FF; }
 
 /* Body */
-#alterus-body {
+#al-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
+#al-body::-webkit-scrollbar { width: 3px; }
+#al-body::-webkit-scrollbar-thumb { background: #1E2235; }
 
-.alterus-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.alterus-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
+.al-section { display: flex; flex-direction: column; gap: 6px; }
+.al-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #475569;
 }
 
-/* Tone selector */
-#alterus-tone-row {
-  display: flex;
-  gap: 4px;
-}
-
-.tone-opt {
-  flex: 1;
-  text-align: center;
+/* Tone buttons */
+#al-tones { display: flex; gap: 4px; }
+.al-tone {
+  flex: 1; text-align: center;
   padding: 6px 4px;
   border: 1px solid #1E2235;
   border-radius: 4px;
-  font-size: 11px;
-  color: #64748B;
-  cursor: pointer;
+  font-size: 11px; color: #64748B;
+  cursor: pointer; user-select: none;
   transition: all 0.15s;
-  user-select: none;
 }
-.tone-opt:hover { border-color: #6366F1; color: #818CF8; }
-.tone-opt.active {
+.al-tone:hover { border-color: #6366F1; color: #818CF8; }
+.al-tone.active {
   background: rgba(99,102,241,0.15);
-  border-color: #6366F1;
-  color: #818CF8;
-  font-weight: 500;
+  border-color: #6366F1; color: #818CF8;
 }
 
 /* Draft button */
-#alterus-draft-btn {
-  width: 100%;
-  padding: 12px;
-  background: #6366F1;
-  border: none;
-  border-radius: 6px;
-  color: #fff;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
+#al-draft-btn {
+  width: 100%; padding: 11px;
+  background: #6366F1; border: none;
+  border-radius: 6px; color: white;
+  font-size: 13px; font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-  letter-spacing: 0.02em;
+  transition: background 0.2s;
 }
-#alterus-draft-btn:hover  { background: #818CF8; }
-#alterus-draft-btn:active { transform: scale(0.98); }
+#al-draft-btn:hover { background: #818CF8; }
 
 /* Status */
-.alterus-status {
-  font-size: 12px;
-  min-height: 18px;
-  color: #64748B;
-  font-family: 'DM Mono', monospace;
-}
-.alterus-status.ok      { color: #22C55E; }
-.alterus-status.error   { color: #EF4444; }
-.alterus-status.warn    { color: #F59E0B; }
-.alterus-status.loading { color: #6366F1; }
+.al-status { font-size: 11px; min-height: 16px; color: #64748B; }
+.al-status.ok      { color: #22C55E; }
+.al-status.error   { color: #EF4444; }
+.al-status.warn    { color: #F59E0B; }
+.al-status.loading { color: #818CF8; }
 
-/* Draft area */
-#alterus-draft-text {
+/* Draft result */
+#al-text {
   width: 100%;
   background: #0A0D1A;
   border: 1px solid #1E2235;
   border-radius: 6px;
   color: #EEF0FF;
   font-family: inherit;
-  font-size: 12px;
-  line-height: 1.6;
-  padding: 10px;
-  resize: vertical;
+  font-size: 12px; line-height: 1.6;
+  padding: 10px; resize: vertical;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
-#alterus-draft-text:focus { border-color: #6366F1; }
+#al-text:focus { border-color: #6366F1; }
 
-#alterus-draft-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  flex-wrap: wrap;
+#al-actions {
+  display: flex; align-items: center;
+  gap: 6px; margin-top: 8px; flex-wrap: wrap;
 }
-
-.alterus-action-btn {
+.al-btn {
   padding: 7px 14px;
-  background: #6366F1;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 12px;
-  cursor: pointer;
+  background: #6366F1; border: none;
+  border-radius: 4px; color: white;
+  font-size: 12px; cursor: pointer;
   transition: background 0.2s;
-  font-family: inherit;
 }
-.alterus-action-btn:hover { background: #818CF8; }
-.alterus-action-btn.secondary {
+.al-btn:hover { background: #818CF8; }
+.al-btn.sec {
   background: transparent;
-  border: 1px solid #1E2235;
-  color: #64748B;
+  border: 1px solid #1E2235; color: #64748B;
 }
-.alterus-action-btn.secondary:hover {
-  border-color: #6366F1;
-  color: #818CF8;
-}
+.al-btn.sec:hover { border-color: #6366F1; color: #818CF8; }
 
-/* Feedback buttons */
-#alterus-feedback {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
-}
-.fb-btn {
+#al-fb { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.fb {
   background: none;
   border: 1px solid #1E2235;
-  border-radius: 4px;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: border-color 0.15s, background 0.15s;
+  border-radius: 4px; padding: 4px 8px;
+  cursor: pointer; font-size: 13px;
+  transition: border-color 0.15s;
 }
-.fb-btn:hover { border-color: #6366F1; background: rgba(99,102,241,0.1); }
-.fb-btn:disabled { opacity: 0.4; cursor: default; }
-#fb-msg {
-  font-size: 10px;
-  color: #22C55E;
-  font-family: 'DM Mono', monospace;
-}
+.fb:hover { border-color: #6366F1; }
+.fb:disabled { opacity: 0.4; cursor: default; }
+#fb-msg { font-size: 10px; color: #22C55E; }
 
-/* Connection buttons */
-#alterus-connections {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-top: 8px;
+/* Connections */
+#al-conns {
+  display: flex; flex-direction: column;
+  gap: 6px; padding-top: 10px;
   border-top: 1px solid #1E2235;
 }
-
-.connect-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.al-conn {
+  display: flex; align-items: center; gap: 8px;
   padding: 9px 12px;
   background: transparent;
   border: 1px solid #1E2235;
-  border-radius: 6px;
-  color: #94A3B8;
-  font-family: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
+  border-radius: 6px; color: #94A3B8;
+  font-size: 12px; cursor: pointer;
+  transition: all 0.2s; text-align: left;
+  width: 100%;
 }
-.connect-btn:hover {
-  border-color: #6366F1;
-  color: #818CF8;
-  background: rgba(99,102,241,0.05);
+.al-conn span {
+  width: 18px; height: 18px;
+  background: #1E2235; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: bold;
 }
-.connect-btn.connected {
-  border-color: #22C55E;
-  color: #22C55E;
-  cursor: default;
-}
-.connect-btn:disabled {
-  opacity: 0.7;
-  cursor: default;
-}
-
-#connection-status {
-  font-size: 11px;
-  color: #475569;
-  font-family: 'DM Mono', monospace;
-}
-
-/* Toggle tab */
-#alterus-tab {
-  position: fixed;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #6366F1;
-  color: #fff;
-  padding: 12px 6px;
-  border-radius: 6px 0 0 6px;
-  cursor: pointer;
-  font-size: 14px;
-  z-index: 999998;
-  transition: background 0.2s, right 0.3s;
-  writing-mode: vertical-rl;
-  letter-spacing: 0.1em;
-  user-select: none;
-}
-#alterus-tab:hover { background: #818CF8; }
-
-#alterus-sidebar.visible + #alterus-tab,
-#alterus-sidebar.visible #alterus-tab {
-  right: 340px;
-}
-
-/* Scrollbar */
-#alterus-body::-webkit-scrollbar       { width: 4px; }
-#alterus-body::-webkit-scrollbar-track { background: transparent; }
-#alterus-body::-webkit-scrollbar-thumb { background: #1E2235; border-radius: 2px; }
+.al-conn:hover { border-color: #6366F1; color: #818CF8; }
+.al-conn:disabled { opacity: 0.7; cursor: default; border-color: #22C55E; color: #22C55E; }

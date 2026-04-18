@@ -402,46 +402,63 @@ async def api_draft(request: Request):
         return {"error": "No message body provided"}
 
     try:
-        import sys
+        import sys, uuid
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent.parent))
         from agent.drafter import generate
         from agent.persona import build_system_prompt
 
-        tone_instruction = {
-            "direct":     "Be direct, concise, and confident. No filler phrases.",
-            "balanced":   "Be professional and clear. Direct but not blunt.",
-            "diplomatic": "Be warm, considerate, and thoughtful in tone.",
-        }.get(tone, "Be professional and clear.")
+        # Build user config for persona
+        user_config = {
+            "name":         user_name,
+            "title":        data.get("user_title", ""),
+            "company":      data.get("user_company", ""),
+            "stakeholders": stakeholders,
+            "tone":         tone,
+        }
 
-        system_prompt = build_system_prompt("email") if platform in ("gmail", "outlook") else build_system_prompt("teams")
+        task_type     = "email" if platform in ("gmail", "outlook") else "teams"
+        system_prompt = build_system_prompt(task_type, user_config=user_config)
 
-        user_message = f"""
-You are drafting a reply for {user_name or "the user"}.
+        # Get user_id for per-user corpus (use email if available, else name)
+        user_id = data.get("user_email") or user_name.lower().replace(" ","_") or "default"
+
+        # Retrieve relevant history from user's personal corpus
+        history_context = ""
+        try:
+            retriever = Retriever(user_id=user_id)
+            results   = retriever.multi_search([
+                f"email {sender} conversation history",
+                f"{subject} previous discussion",
+            ], top_k=3)
+            if results:
+                history_context = "\n\nRELEVANT PAST CONTEXT:\n"
+                history_context += "\n---\n".join(
+                    r["text"][:300] for r in results[:3]
+                )
+        except Exception:
+            pass
+
+        user_message  = f"""DRAFT A REPLY FOR {user_name or "the user"}.
 
 MESSAGE TO REPLY TO:
 Platform: {platform}
 From: {sender} ({sender_email})
-Subject: {subject}
-Message: {body[:1500]}
-
-TONE: {tone_instruction}
-
-Write a reply in {user_name or "the user"}'s voice.
-Be specific to what {sender} actually said.
-Do not invent facts or projects not mentioned above.
-Under 150 words unless the message requires more detail.
+Subject / Channel: {subject}
+Message body:
+{body[:1500]}
+{history_context}
+INSTRUCTIONS:
+- Reply specifically to what {sender} said above
+- Reference past context only if directly relevant
+- Do NOT invent facts, projects, or commitments not mentioned
+- Write as {user_name or "the user"} in first person
+- Under 150 words unless detail is clearly needed
 """
-        draft = generate(system_prompt, user_message, temperature=0.7)
-
-        import uuid
+        draft  = generate(system_prompt, user_message, temperature=0.7)
         run_id = str(uuid.uuid4())
 
-        return {
-            "draft":    draft,
-            "run_id":   run_id,
-            "platform": platform,
-        }
+        return {"draft": draft, "run_id": run_id, "platform": platform}
 
     except Exception as e:
         return {"error": str(e), "draft": f"[Draft error: {e}]"}
@@ -471,6 +488,8 @@ async def api_ingest_history(request: Request):
         sys.path.insert(0, str(Path(__file__).parent.parent))
         from ingest.chunker import Chunker
         from ingest.embedder import CorpusStore
+        from pathlib import Path as _Path
+        _chroma_dir = _Path("data/chroma_db")
         from datetime import datetime
 
         # Format items as text
@@ -499,8 +518,10 @@ async def api_ingest_history(request: Request):
         tmp_path.parent.mkdir(parents=True, exist_ok=True)
         tmp_path.write_text("\n".join(lines))
 
+        # Use per-user corpus — isolate each user's data
+        ingest_user_id = data.get("user_email") or                          (user_name.lower().replace(" ","_") if user_name else "default")
         chunker = Chunker()
-        store   = CorpusStore()
+        store   = CorpusStore(chroma_dir=_chroma_dir, user_id=ingest_user_id)
         chunks  = chunker.chunk_file(tmp_path)
         added   = store.add_chunks(chunks)
 

@@ -16,8 +16,8 @@ DEFAULT_TOP_K = 5
 
 
 class Retriever:
-    def __init__(self):
-        self.store = CorpusStore(CHROMA_DIR)
+    def __init__(self, user_id: str = "default"):
+        self.store = CorpusStore(CHROMA_DIR, user_id=user_id)
 
     def search(
         self,
