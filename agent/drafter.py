@@ -26,7 +26,6 @@ TEMPERATURE       = 0.7
 MAX_TOKENS        = 2048
 
 USE_CLAUDE = bool(ANTHROPIC_API_KEY and ANTHROPIC_API_KEY.startswith("sk-ant-"))
-print(f"DEBUG: ANTHROPIC_API_KEY set={bool(ANTHROPIC_API_KEY)}, USE_CLAUDE={USE_CLAUDE}", flush=True)
 
 
 def generate(
