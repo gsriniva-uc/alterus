@@ -19,7 +19,8 @@
     "https://*.streamlit.app/*",
     "https://gmail.googleapis.com/*",
     "https://slack.com/*",
-    "https://app.alterus.io/*"
+    "https://app.alterus.io/*",
+    "https://outlook.cloud.microsoft/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -31,7 +32,8 @@
         "https://outlook.office.com/*",
         "https://outlook.live.com/*",
         "https://app.slack.com/*",
-        "https://teams.microsoft.com/*"
+        "https://teams.microsoft.com/*",
+        "https://outlook.cloud.microsoft/*"
       ],
       "js": [
         "content.js"

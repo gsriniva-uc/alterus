@@ -9,6 +9,7 @@ const host     = window.location.hostname;
 const PLATFORM =
   host === 'mail.google.com'           ? 'gmail'   :
   host.includes('outlook.office.com')  ? 'outlook' :
+  host.includes('outlook.cloud.microsoft') ? 'outlook' :
   host.includes('outlook.live.com')    ? 'outlook' :
   host === 'app.slack.com'             ? 'slack'   :
   host === 'teams.microsoft.com'       ? 'teams'   : null;
