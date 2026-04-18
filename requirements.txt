@@ -9,7 +9,6 @@ langgraph==0.0.37
 langsmith==0.1.17
 
 # ── Embeddings (Railway-compatible, no Ollama needed) ─────────────────────────
-sentence-transformers==2.7.0
 chromadb==0.4.24
 
 # ── Webhook server ────────────────────────────────────────────────────────────

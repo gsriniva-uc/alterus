@@ -40,8 +40,18 @@ def build_system_prompt(task_type: str = "email", user_config: dict = None) -> s
             stakeholders = []
             tone         = "balanced"
 
-    # Corpus retrieval disabled for beta
+    # Try to get style examples from corpus
     style_examples = ""
+    try:
+        from retrieval.retriever import Retriever
+        retriever = Retriever()
+        results   = retriever.search(f"{task_type} writing style examples", top_k=2)
+        if results:
+            style_examples = "\n\nSTYLE EXAMPLES FROM YOUR PAST WRITING:\n"
+            for r in results[:2]:
+                style_examples += f"---\n{r['text'][:300]}\n"
+    except Exception:
+        pass
 
     # Tone instruction
     tone_map = {
