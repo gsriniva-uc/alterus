@@ -86,3 +86,11 @@ def get_model_info() -> dict:
         "provider": "Claude API" if USE_CLAUDE else "Ollama (local)",
         "status":   "✅ connected" if USE_CLAUDE else "🟡 local only",
     }
+
+# ── Compatibility aliases ─────────────────────────────────────────────────────
+# graph.py imports these names — aliased here to avoid breaking changes
+draft_response = generate
+
+def check_ollama() -> bool:
+    """Compatibility shim — returns True if Claude API is configured."""
+    return bool(ANTHROPIC_API_KEY)
