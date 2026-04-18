@@ -12,7 +12,8 @@ const PLATFORM =
   host.includes('outlook.cloud.microsoft') ? 'outlook' :
   host.includes('outlook.live.com')    ? 'outlook' :
   host === 'app.slack.com'             ? 'slack'   :
-  host === 'teams.microsoft.com'       ? 'teams'   : null;
+  host === 'teams.microsoft.com'       ? 'teams'   :
+  host.includes('teams.microsoft.com')  ? 'teams'   : null;
 
 if (!PLATFORM) { /* not our page */ throw new Error('not our page'); }
 
@@ -67,8 +68,8 @@ function readSlack() {
 }
 
 function readTeams() {
-  const channel  = document.querySelector('[data-tid="channel-name"]')?.innerText?.trim() || '';
-  const msgs     = Array.from(document.querySelectorAll('[data-tid="message-body-content"]'))
+  const channel  = document.querySelector('[data-tid="chat-title"]')?.innerText?.trim() || '';
+  const msgs     = Array.from(document.querySelectorAll('[data-tid="chat-pane-message"]'))
                        .slice(-8).map(e => e.innerText?.trim()).filter(Boolean);
   const senders  = document.querySelectorAll('[data-tid="message-author-name"]');
   const sender   = senders[senders.length-1]?.innerText?.trim() || '';
