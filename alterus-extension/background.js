@@ -148,3 +148,18 @@ function chromeGet(key) {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── External messages from app.alterus.io ────────────────────────────────────
+chrome.runtime.onMessageExternal.addListener((msg, sender, reply) => {
+  if (msg.type === 'ALTERUS_CONNECT') {
+    chrome.storage.local.set({
+      userConfig: {
+        name:  msg.name,
+        email: msg.email,
+        userId: msg.userId,
+        connectedViaApp: true,
+      }
+    }, () => reply({ success: true }));
+    return true;
+  }
+});

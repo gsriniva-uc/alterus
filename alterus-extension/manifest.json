@@ -61,5 +61,10 @@
       "https://www.googleapis.com/auth/gmail.readonly",
       "https://www.googleapis.com/auth/gmail.compose"
     ]
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://app.alterus.io/*"
+    ]
   }
 }
