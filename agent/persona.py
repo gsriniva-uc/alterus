@@ -97,3 +97,15 @@ RULES:
 {style_examples}"""
 
     return prompt
+
+# ── Compatibility alias ───────────────────────────────────────────────────────
+# ui/app.py imports PERSONA_CARD — provide a dynamic version
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).parent.parent))
+
+try:
+    from config import USER_NAME, USER_TITLE, USER_COMPANY
+    PERSONA_CARD = f"{USER_NAME} · {USER_TITLE} · {USER_COMPANY}"
+except Exception:
+    PERSONA_CARD = "Alterus User"
