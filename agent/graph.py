@@ -26,10 +26,14 @@ from agent.critic     import evaluate_draft, format_critique_for_langsmith, Crit
 from retrieval.retriever import Retriever
 
 # ── LangSmith setup ───────────────────────────────────────────────────────────
-os.environ.setdefault("LANGSMITH_TRACING",  "true")
-os.environ.setdefault("LANGSMITH_PROJECT",  "ganesh-agent")
+os.environ.setdefault("LANGSMITH_TRACING",  os.getenv("LANGSMITH_TRACING", "false"))
+os.environ.setdefault("LANGSMITH_PROJECT",  os.getenv("LANGSMITH_PROJECT", "alterus"))
 
-ls_client = LangSmithClient() if os.getenv("LANGSMITH_API_KEY") else None
+_ls_key = os.getenv("LANGSMITH_API_KEY", "")
+try:
+    ls_client = LangSmithClient(api_key=_ls_key) if _ls_key else None
+except Exception:
+    ls_client = None
 
 MAX_RETRIES = 2   # max critique-retry loops before escalating to HITL
 
