@@ -1,3 +1,22 @@
+// Load from URL params if coming from app.alterus.io
+const params = new URLSearchParams(window.location.search);
+if (params.get('name') || params.get('email')) {
+  const config = {
+    name: params.get('name') || '',
+    email: params.get('email') || '',
+    role: '',
+    company: '',
+    stakeholders: [],
+  };
+  chrome.storage.local.set({ 
+    userConfig: config,
+    alterusApiUrl: 'https://alterus.onrender.com'
+  });
+  document.getElementById('name').value = config.name;
+  document.getElementById('email').value = config.email;
+  document.getElementById('savedMsg').textContent = '✓ Connected from app.alterus.io!';
+}
+
 // Load saved values
 chrome.storage.local.get(['userConfig','alterusApiUrl',
   'gmailConnected','slackConnected','gmailHistory',
