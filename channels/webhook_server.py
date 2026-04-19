@@ -810,3 +810,51 @@ async def zoom_meetings(user_email: str = "default"):
         return {"meetings": meetings[:20]}
     except Exception as e:
         return {"meetings": [], "error": str(e)}
+
+# ── Self-Healing Endpoints ────────────────────────────────────────────────────
+@app.post("/api/healer/run")
+async def run_healer(request: Request):
+    """Run the self-healing batch analyzer."""
+    try:
+        data        = await request.json()
+        auto_apply  = data.get("auto_apply", False)
+        from agent.self_healer import run_batch_healer
+        report = run_batch_healer(auto_apply=auto_apply)
+        return report
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.post("/api/healer/feedback")
+async def log_healer_feedback(request: Request):
+    """Log individual feedback entry for self-healing."""
+    try:
+        data = await request.json()
+        from agent.self_healer import save_feedback
+        entry = {
+            "timestamp":     __import__("datetime").datetime.now().isoformat(),
+            "feedback_type": data.get("feedback_type", ""),
+            "platform":      data.get("platform", "email"),
+            "task_type":     data.get("task_type", "draft"),
+            "draft":         data.get("draft", ""),
+            "edited_draft":  data.get("edited_draft", ""),
+            "input_text":    data.get("input_text", ""),
+            "user_email":    data.get("user_email", "default"),
+        }
+        save_feedback(entry)
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/api/healer/report")
+async def get_healer_report():
+    """Get the latest self-healer report."""
+    try:
+        from agent.self_healer import HEALER_REPORT
+        if HEALER_REPORT.exists():
+            import json as _j
+            return _j.loads(HEALER_REPORT.read_text())
+        return {"error": "No report yet. Run the healer first."}
+    except Exception as e:
+        return {"error": str(e)}
