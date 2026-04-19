@@ -880,13 +880,20 @@ Under 120 words. No headers. No markdown. Plain flowing sentences."""
 
 My agenda: {agenda if agenda else "No agenda provided — use general priorities"}
 
-Write my daily briefing covering:
-1. Top 3 priorities for today (specific, actionable)
-2. Who needs a response from me today
-3. One risk to watch
-4. One motivational sentence to close
+Write my daily briefing in this exact format:
 
-Under 120 words. First person. Direct. No fluff. No headers."""
+**Today's Priorities:**
+- [Priority 1 — specific and actionable]
+- [Priority 2 — specific and actionable]  
+- [Priority 3 — specific and actionable]
+
+**Needs Response:** [Name 1], [Name 2] — or "None today"
+
+**Risk Watch:** [One specific risk in one sentence]
+
+**Mindset:** [One motivational sentence]
+
+Use bullet points. First person. Under 120 words total. Be specific — use real names and projects from agenda if provided."""
 
         briefing = generate(system_prompt, user_message, temperature=0.8)
         return {"briefing": briefing}
