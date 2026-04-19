@@ -858,3 +858,38 @@ async def get_healer_report():
         return {"error": "No report yet. Run the healer first."}
     except Exception as e:
         return {"error": str(e)}
+
+# ── Daily Briefing ────────────────────────────────────────────────────────────
+@app.post("/api/briefing")
+async def daily_briefing(request: Request):
+    """Generate a personalized daily briefing in first person."""
+    try:
+        data       = await request.json()
+        user_name  = data.get("user_name", "")
+        user_email = data.get("user_email", "default")
+        agenda     = data.get("agenda", "")
+        date       = data.get("date", "")
+
+        from agent.drafter import generate
+
+        system_prompt = f"""You are {user_name}. Write a daily briefing to yourself in first person.
+Be direct, specific, and actionable. Sound like a smart chief of staff briefing themselves.
+Under 120 words. No headers. No markdown. Plain flowing sentences."""
+
+        user_message = f"""Today is {date}.
+
+My agenda: {agenda if agenda else "No agenda provided — use general priorities"}
+
+Write my daily briefing covering:
+1. Top 3 priorities for today (specific, actionable)
+2. Who needs a response from me today
+3. One risk to watch
+4. One motivational sentence to close
+
+Under 120 words. First person. Direct. No fluff. No headers."""
+
+        briefing = generate(system_prompt, user_message, temperature=0.8)
+        return {{"briefing": briefing}}
+
+    except Exception as e:
+        return {{"error": str(e)}}
