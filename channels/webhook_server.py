@@ -693,3 +693,87 @@ async def get_ai_news():
         return {"news": news[:8]}
     except Exception as e:
         return {"news": [], "error": str(e)}
+
+
+# ── Zoom Meeting Storage ───────────────────────────────────────────────────────
+import json as _json
+import re as _re
+from pathlib import Path as _Path
+
+_ZOOM_DIR = _Path("data/zoom_meetings")
+_ZOOM_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@app.post("/api/zoom/ingest")
+async def zoom_ingest(request: Request):
+    data       = await request.json()
+    transcript = data.get("transcript", "")
+    title      = data.get("title", "Meeting")
+    date       = data.get("date", "")
+    user_email = data.get("user_email", "default")
+
+    if not transcript:
+        return {"error": "No transcript provided"}
+
+    try:
+        from agent.drafter import generate
+
+        system_prompt = "You are an expert meeting analyst. Analyze meeting transcripts and extract structured insights. Always respond in valid JSON only, no other text."
+
+        user_message = f"""Analyze this meeting transcript and return a JSON object with these exact keys:
+{{
+  "summary": "3-4 sentence summary",
+  "meeting_sentiment": "productive|neutral|tense|inconclusive",
+  "participants": ["name1", "name2"],
+  "key_topics": ["topic1", "topic2"],
+  "decisions": [{{"decision": "...", "made_by": "..."}}],
+  "action_items": [{{"owner": "...", "action": "...", "deadline": "...", "priority": "high|medium|low"}}],
+  "followup_email": "full follow-up email draft"
+}}
+
+Meeting title: {title}
+Date: {date}
+
+Transcript:
+{transcript[:4000]}
+
+Return ONLY the JSON object."""
+
+        raw = generate(system_prompt, user_message, temperature=0.3)
+
+        json_match = _re.search(r'\{.*\}', raw, _re.DOTALL)
+        if json_match:
+            result = _json.loads(json_match.group())
+        else:
+            result = _json.loads(raw.strip())
+
+        result["id"]                 = f"{user_email}_{date}_{title[:20]}".replace(" ", "_")
+        result["meeting_title"]      = title
+        result["meeting_date"]       = date
+        result["user_email"]         = user_email
+        result["transcript_preview"] = transcript[:500]
+
+        safe_id  = _re.sub(r"[^a-zA-Z0-9_-]", "_", result["id"])[:80]
+        out_path = _ZOOM_DIR / f"{safe_id}.json"
+        out_path.write_text(_json.dumps(result, indent=2))
+
+        return {"success": True, "meeting_id": result["id"], "title": title}
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.get("/api/zoom/meetings")
+async def zoom_meetings(user_email: str = "default"):
+    try:
+        meetings = []
+        for f in sorted(_ZOOM_DIR.glob("*.json"), reverse=True):
+            try:
+                m = _json.loads(f.read_text())
+                if m.get("user_email") == user_email or user_email == "default":
+                    meetings.append(m)
+            except Exception:
+                continue
+        return {"meetings": meetings[:20]}
+    except Exception as e:
+        return {"meetings": [], "error": str(e)}
