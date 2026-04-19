@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "identity",
-    "clipboardWrite"
+    "clipboardWrite",
+    "identity.email"
   ],
   "host_permissions": [
     "https://mail.google.com/*",
