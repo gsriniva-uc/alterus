@@ -401,6 +401,31 @@ async def api_draft(request: Request):
     if not body:
         return {"error": "No message body provided"}
 
+    user_email = data.get("user_email", data.get("user_name", "default"))
+
+    # ── ReAct agent (deep reasoning) ─────────────────────────────────────────
+    try:
+        from agent.react_agent import run_react_agent
+        result = run_react_agent(
+            platform   = platform,
+            sender     = sender,
+            subject    = subject,
+            body       = body,
+            user_name  = user_name or "User",
+            user_email = user_email,
+            tone       = tone.capitalize() if tone else "Balanced",
+        )
+        return {
+            "draft":          result["draft"],
+            "critique":       result.get("critique", {}),
+            "steps_taken":    result.get("steps_taken", 0),
+            "reasoning_trace": result.get("reasoning_trace", []),
+            "agent":          "react",
+        }
+    except Exception as e:
+        # Fallback to simple draft if ReAct fails
+        pass
+
     try:
         import sys, uuid
         from pathlib import Path
@@ -535,6 +560,7 @@ async def api_ingest_history(request: Request):
 
 @app.post("/api/feedback")
 async def api_feedback(request: Request):
+    """Log feedback and write approved drafts to corpus."""
     """Called by extension to log feedback."""
     try:
         data = await request.json()
@@ -756,6 +782,13 @@ Return ONLY the JSON object."""
         safe_id  = _re.sub(r"[^a-zA-Z0-9_-]", "_", result["id"])[:80]
         out_path = _ZOOM_DIR / f"{safe_id}.json"
         out_path.write_text(_json.dumps(result, indent=2))
+
+        # Write meeting to corpus for future context
+        try:
+            from agent.memory_writeback import write_zoom_to_corpus
+            write_zoom_to_corpus(user_email, result)
+        except Exception:
+            pass
 
         return {"success": True, "meeting_id": result["id"], "title": title}
 
