@@ -889,7 +889,7 @@ Write my daily briefing covering:
 Under 120 words. First person. Direct. No fluff. No headers."""
 
         briefing = generate(system_prompt, user_message, temperature=0.8)
-        return {{"briefing": briefing}}
+        return {"briefing": briefing}
 
     except Exception as e:
-        return {{"error": str(e)}}
+        return {"error": str(e)}
