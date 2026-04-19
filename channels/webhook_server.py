@@ -578,3 +578,118 @@ if __name__ == "__main__":
     print(f"🧹 Dedup:    POST /data/calendar/dedup\n")
     uvicorn.run("channels.webhook_server:app", host="0.0.0.0",
                 port=PORT, reload=True)
+
+# ── Clone Score ───────────────────────────────────────────────────────────────
+@app.get("/api/clone-score")
+async def get_clone_score(user_email: str = "default"):
+    try:
+        from ingest.embedder import CorpusStore, _safe_collection_name
+        from pathlib import Path
+        store = CorpusStore(Path("data/chroma_db"), user_id=user_email)
+        count = store.count()
+        # Score based on corpus size
+        if count == 0:
+            score = 5
+        elif count < 20:
+            score = 15
+        elif count < 50:
+            score = 30
+        elif count < 100:
+            score = 45
+        elif count < 200:
+            score = 60
+        elif count < 400:
+            score = 75
+        else:
+            score = 90
+        return {"score": score, "chunks": count}
+    except Exception as e:
+        return {"score": 5, "chunks": 0}
+
+
+# ── PRD Generator ─────────────────────────────────────────────────────────────
+@app.post("/api/generate-prd")
+async def generate_prd(request: Request):
+    data       = await request.json()
+    prompt     = data.get("prompt", "")
+    user_name  = data.get("user_name", "the user")
+    user_email = data.get("user_email", "default")
+
+    if not prompt:
+        return {"error": "No prompt provided"}
+
+    try:
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from agent.drafter import generate
+
+        system_prompt = f"""You are {user_name}, a senior product manager.
+Write a comprehensive PRD in first person as {user_name}.
+Format with these sections:
+# [Feature Name]
+
+## Overview
+## Problem Statement  
+## Goals & Success Metrics
+## User Stories
+## Functional Requirements
+## Non-Functional Requirements
+## Out of Scope
+## Timeline & Milestones
+
+Be specific, actionable, and data-driven. Under 600 words."""
+
+        user_message = f"Write a PRD for: {prompt}"
+        prd = generate(system_prompt, user_message, temperature=0.7)
+        return {"prd": prd}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# ── AI News ───────────────────────────────────────────────────────────────────
+@app.get("/api/ai-news")
+async def get_ai_news():
+    try:
+        import urllib.request
+        import xml.etree.ElementTree as ET
+        from datetime import datetime
+
+        feeds = [
+            ("https://hnrss.org/newest?q=AI+LLM+agent&count=5", "Hacker News"),
+            ("https://www.anthropic.com/rss.xml", "Anthropic"),
+        ]
+
+        news = []
+        for url, source in feeds:
+            try:
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=5) as resp:
+                    tree = ET.parse(resp)
+                    root = tree.getroot()
+                    items = root.findall(".//item")[:3]
+                    for item in items:
+                        title = item.findtext("title", "").strip()
+                        link  = item.findtext("link", "").strip()
+                        pub   = item.findtext("pubDate", "").strip()
+                        if title and link:
+                            news.append({
+                                "title":  title[:100],
+                                "url":    link,
+                                "source": source,
+                                "time":   pub[:16] if pub else ""
+                            })
+            except Exception:
+                continue
+
+        # Fallback if feeds fail
+        if not news:
+            news = [
+                {"title": "Anthropic releases Claude 4", "url": "https://anthropic.com", "source": "Anthropic", "time": "Today"},
+                {"title": "OpenAI announces GPT-5", "url": "https://openai.com", "source": "OpenAI", "time": "Today"},
+                {"title": "Google DeepMind releases Gemini Ultra 2", "url": "https://deepmind.google", "source": "Google", "time": "Today"},
+            ]
+
+        return {"news": news[:8]}
+    except Exception as e:
+        return {"news": [], "error": str(e)}
