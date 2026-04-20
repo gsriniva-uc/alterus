@@ -86,27 +86,55 @@ def analyze_stakeholders(user_email: str, known_stakeholders: list = None) -> li
 
 
 def _extract_stakeholder_names(retriever) -> list:
-    """Extract stakeholder names from corpus."""
+    """
+    Auto-extract stakeholder names from any user's corpus.
+    Uses NLP patterns to find proper nouns that appear frequently.
+    Works for any user regardless of their network.
+    """
     try:
         results = retriever.multi_search([
-            "email meeting discussion stakeholder",
-            "Jason Raghu Jerry Senthil Mili",
-        ], top_k=10)
+            "email meeting discussion",
+            "reply response sent",
+            "team stakeholder colleague",
+        ], top_k=15)
 
-        # Common enterprise names to look for
-        common_names = [
-            "Jason", "Raghu", "Jerry", "Senthil", "Mili",
-            "Sibanjan", "Luke", "Sarah", "Michael", "Nikhita"
+        corpus_text = " ".join(r.get("text", "") for r in results)
+
+        # Extract capitalized names using pattern matching
+        # Matches "First Last" or "First" patterns
+        import re
+        from collections import Counter
+
+        # Find all capitalized word sequences (likely names)
+        name_pattern = re.compile(r"\b([A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})?)\b")
+        candidates = name_pattern.findall(corpus_text)
+
+        # Filter out common non-name words
+        skip_words = {
+            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+            "Saturday", "Sunday", "January", "February", "March",
+            "April", "May", "June", "July", "August", "September",
+            "October", "November", "December", "The", "This", "That",
+            "From", "Subject", "Dear", "Best", "Thanks", "Regards",
+            "Please", "Meeting", "Email", "Teams", "Slack", "Zoom",
+            "Microsoft", "Google", "ServiceNow", "Anthropic", "Claude",
+            "Customer", "Engine", "Feature", "Store", "Platform",
+        }
+
+        filtered = [
+            n for n in candidates
+            if not any(word in skip_words for word in n.split())
+            and len(n) > 3
         ]
 
-        found = []
-        corpus_text = " ".join(r.get("text", "") for r in results)
-        for name in common_names:
-            if name.lower() in corpus_text.lower():
-                found.append(name)
+        # Return most frequent names
+        counter = Counter(filtered)
+        top_names = [name for name, count in counter.most_common(10) if count >= 2]
 
-        return found[:8]
-    except Exception:
+        return top_names[:8] if top_names else []
+
+    except Exception as e:
+        print(f"Name extraction error: {e}")
         return []
 
 
