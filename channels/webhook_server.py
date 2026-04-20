@@ -946,3 +946,60 @@ async def update_stakeholder_profile(request: Request):
         return {"success": success}
     except Exception as e:
         return {"error": str(e)}
+
+# ── Inbox Activity Feed ───────────────────────────────────────────────────────
+@app.get("/api/inbox/activity")
+async def inbox_activity(user_email: str = "default"):
+    """
+    Returns real draft activity from extension usage.
+    Pulled from feedback_log.json — shows Gmail/Outlook/Teams separately.
+    """
+    try:
+        from agent.self_healer import load_feedback
+        feedback = load_feedback()
+
+        # Filter by user
+        user_feedback = [
+            f for f in feedback
+            if f.get("user_email", "default") == user_email
+            or user_email == "default"
+        ]
+
+        # Group by platform
+        gmail   = []
+        outlook = []
+        teams   = []
+        other   = []
+
+        for f in reversed(user_feedback):  # most recent first
+            platform = f.get("platform", "email").lower()
+            entry = {
+                "timestamp":     f.get("timestamp", ""),
+                "sender":        f.get("sender", f.get("input_text", "")[:40]),
+                "subject":       f.get("subject", f.get("task_type", "Draft")),
+                "draft_snippet": f.get("draft", "")[:120],
+                "feedback":      f.get("feedback_type", ""),
+                "platform":      platform,
+                "task_type":     f.get("task_type", "draft"),
+                "input_snippet": f.get("input_text", "")[:100],
+            }
+
+            if "gmail" in platform or (platform == "email" and "gmail" in f.get("source", "")):
+                gmail.append(entry)
+            elif "outlook" in platform or "office" in platform:
+                outlook.append(entry)
+            elif "teams" in platform or "slack" in platform:
+                teams.append(entry)
+            else:
+                other.append(entry)
+
+        return {
+            "gmail":   gmail[:10],
+            "outlook": outlook[:10],
+            "teams":   teams[:10],
+            "other":   other[:5],
+            "total":   len(user_feedback),
+        }
+
+    except Exception as e:
+        return {"gmail": [], "outlook": [], "teams": [], "other": [], "total": 0, "error": str(e)}
