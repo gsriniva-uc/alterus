@@ -118,8 +118,8 @@ def run_react_agent(
         return json.dumps(scores)
 
     def get_persona() -> str:
-        """Get user's writing style profile."""
-        return f"""
+        """Get user's writing style + stakeholder profile."""
+        base = f"""
 Name: {user_name}
 Platform: {platform}
 Tone setting: {tone}
@@ -128,6 +128,22 @@ Avoids: filler phrases, excessive pleasantries, passive voice
 Typical length: 50-150 words for emails, 20-60 words for Teams
 Signature style: Gets to the point fast, ends with clear next step
 """
+        # Enrich with stakeholder profile if available
+        if sender:
+            try:
+                from agent.stakeholder_intelligence import get_profile
+                profile = get_profile(user_email, sender.split()[0])
+                if profile and profile.get("draft_instruction"):
+                    base += f"""
+STAKEHOLDER PROFILE for {sender}:
+- Communication style: {profile.get("communication_style", "unknown")}
+- Preferred tone: {profile.get("preferred_tone", "")}
+- Draft instruction: {profile.get("draft_instruction", "")}
+- Avoid: {", ".join(profile.get("avoid", []))}
+"""
+            except Exception:
+                pass
+        return base
 
     # ── ReAct system prompt ───────────────────────────────────────────────────
     system_prompt = f"""You are {user_name}'s AI writing assistant using ReAct reasoning.

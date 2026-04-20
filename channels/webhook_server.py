@@ -900,3 +900,49 @@ Use bullet points. First person. Under 120 words total. Be specific — use real
 
     except Exception as e:
         return {"error": str(e)}
+
+# ── Stakeholder Intelligence ──────────────────────────────────────────────────
+@app.post("/api/stakeholders/analyze")
+async def analyze_stakeholders(request: Request):
+    """Analyze corpus to build stakeholder profiles."""
+    try:
+        data               = await request.json()
+        user_email         = data.get("user_email", "default")
+        known_stakeholders = data.get("stakeholders", [])
+
+        from agent.stakeholder_intelligence import analyze_stakeholders
+        profiles = analyze_stakeholders(user_email, known_stakeholders or None)
+        return {"profiles": profiles, "count": len(profiles)}
+    except Exception as e:
+        return {"error": str(e), "profiles": []}
+
+
+@app.get("/api/stakeholders/profiles")
+async def get_stakeholder_profiles(user_email: str = "default"):
+    """Get all stakeholder profiles for a user."""
+    try:
+        from agent.stakeholder_intelligence import get_all_profiles
+        profiles = get_all_profiles(user_email)
+        return {"profiles": profiles}
+    except Exception as e:
+        return {"profiles": [], "error": str(e)}
+
+
+@app.post("/api/stakeholders/update")
+async def update_stakeholder_profile(request: Request):
+    """Update stakeholder profile after approved draft."""
+    try:
+        data             = await request.json()
+        user_email       = data.get("user_email", "default")
+        stakeholder_name = data.get("stakeholder_name", "")
+        draft            = data.get("draft", "")
+        feedback         = data.get("feedback", "approved")
+        context          = data.get("context", "")
+
+        from agent.stakeholder_intelligence import update_profile_from_draft
+        success = update_profile_from_draft(
+            user_email, stakeholder_name, draft, feedback, context
+        )
+        return {"success": success}
+    except Exception as e:
+        return {"error": str(e)}
