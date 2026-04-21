@@ -384,6 +384,8 @@ async def api_draft(request: Request):
     Called by the Chrome extension to generate a draft.
     Accepts email/chat context, returns draft text.
     """
+    if not verify_request(request):
+        return {"error": "unauthorized"}
     try:
         data = await request.json()
     except Exception:
