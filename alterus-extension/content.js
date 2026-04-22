@@ -260,6 +260,40 @@ function wireEvents(sb) {
         sb.querySelector('#fb-up').disabled  = false;
         sb.querySelector('#fb-dn').disabled  = false;
         setStatus('', '');
+
+        // Run communication risk check
+        const senderName = sender ? sender.split(' ')[0] : '';
+        if (senderName) {
+          let riskEl = sb.querySelector('#al-risk');
+          if (!riskEl) {
+            riskEl = document.createElement('div');
+            riskEl.id = 'al-risk';
+            const textArea = sb.querySelector('#al-text');
+            textArea.parentNode.insertBefore(riskEl, textArea);
+          }
+          riskEl.style.cssText = 'margin:6px 0;font-size:11px;color:#5a607a;font-family:monospace;padding:6px;';
+          riskEl.textContent = '⏳ Checking risk...';
+          checkCommunicationRisk(draft, senderName, PLATFORM).then(risk => {
+            if (!risk) { riskEl.remove(); return; }
+            if (risk.status === 'scored') {
+              const color = risk.risk_level === 'high' ? '#ef4444'
+                : risk.risk_level === 'medium' ? '#f59e0b' : '#22c55e';
+              riskEl.style.cssText = `margin:6px 0;background:#0a0d16;border-left:3px solid ${color};
+                border-radius:0 6px 6px 0;padding:8px 10px;font-size:11px;`;
+              riskEl.innerHTML =
+                `<div style="color:${color};font-weight:600;margin-bottom:3px;">
+                  ${risk.risk_emoji} ${risk.risk_score}% Risk — ${risk.risk_level}
+                </div>` +
+                (risk.explanation ? `<div style="color:#8b8fa8;margin-bottom:3px;">${risk.explanation}</div>` : '') +
+                (risk.suggestion ? `<div style="color:#6366f1;">💡 ${risk.suggestion}</div>` : '');
+            } else if (risk.status === 'insufficient_data') {
+              riskEl.style.cssText = 'margin:6px 0;font-size:10px;color:#3a3f55;font-family:monospace;padding:4px 0;';
+              riskEl.textContent = '🔒 ' + risk.message;
+            } else {
+              riskEl.remove();
+            }
+          });
+        }
       } else {
         setStatus(`❌ ${data.error || 'Draft failed'}`, 'error');
       }
