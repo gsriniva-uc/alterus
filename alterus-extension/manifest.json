@@ -46,7 +46,8 @@
     },
     {
       "matches": [
-        "https://app.alterus.io/*"
+        "https://app.alterus.io/*",
+        "https://outlook.cloud.microsoft/*"
       ],
       "js": [
         "app_bridge.js"

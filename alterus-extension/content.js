@@ -232,9 +232,11 @@ function wireEvents(sb) {
 
     try {
       const cfg = await getConfig();
+      const headers = { 'Content-Type': 'application/json' };
+      if (userToken) headers['Authorization'] = `Bearer ${userToken}`;
       const res = await fetch(`${ALTERUS_API}/api/draft`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           platform:      ctx.platform,
           type:          ctx.type,
@@ -376,9 +378,11 @@ async function getConfig() {
 
 async function sendFeedback(type, draft, runId) {
   try {
+    const fbHeaders = { 'Content-Type': 'application/json' };
+    if (userToken) fbHeaders['Authorization'] = `Bearer ${userToken}`;
     await fetch(`${ALTERUS_API}/api/feedback`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: fbHeaders,
       body: JSON.stringify({ type, draft, run_id: runId }),
     });
   } catch(e) {}
@@ -407,9 +411,11 @@ setTimeout(() => {
 async function checkCommunicationRisk(draft, stakeholderName, platform) {
   if (!draft || !stakeholderName) return null;
   try {
+    const riskHeaders = { 'Content-Type': 'application/json' };
+    if (userToken) riskHeaders['Authorization'] = `Bearer ${userToken}`;
     const res = await fetch(`${ALTERUS_API}/api/risk/analyze`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: riskHeaders,
       body: JSON.stringify({
         draft,
         stakeholder_name: stakeholderName,
