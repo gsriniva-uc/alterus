@@ -30,7 +30,7 @@ FRONTEND_URL  = os.getenv("FRONTEND_URL", "https://app.alterus.io")
 
 SCOPES = "openid email profile Mail.Read Mail.ReadWrite Mail.Send offline_access"
 
-TOKEN_DIR = Path("data/outlook_tokens")
+TOKEN_DIR = Path("/data/outlook_tokens")
 TOKEN_DIR.mkdir(parents=True, exist_ok=True)
 
 router = APIRouter(prefix="/outlook", tags=["outlook"])
