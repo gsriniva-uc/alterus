@@ -407,7 +407,7 @@ setTimeout(() => {
 async function checkCommunicationRisk(draft, stakeholderName, platform) {
   if (!draft || !stakeholderName) return null;
   try {
-    const res = await fetch(`${API_BASE}/api/risk/analyze`, {
+    const res = await fetch(`${ALTERUS_API}/api/risk/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
