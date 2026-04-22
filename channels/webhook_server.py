@@ -25,8 +25,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from channels.outlook_connector import router as outlook_router
-app.include_router(outlook_router)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 DATA_DIR      = Path("data")
@@ -40,6 +38,9 @@ MY_NAME       = "Ganesh Srinivasan"
 MY_EMAIL      = "ganesh.srinivasan@servicenow.com"
 
 app = FastAPI(title="Alterus Webhook Server v2")
+
+from channels.outlook_connector import router as outlook_router
+app.include_router(outlook_router)
 
 app.add_middleware(
     CORSMiddleware,
