@@ -367,3 +367,50 @@ setTimeout(() => {
   }).observe(document, { subtree: true, childList: true });
 
 }, 2500);
+
+
+// ── Communication Risk Check ──────────────────────────────────────────────────
+async function checkCommunicationRisk(draft, stakeholderName, platform) {
+  if (!draft || !stakeholderName) return null;
+  try {
+    const res = await fetch(`${API_BASE}/api/risk/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        draft,
+        stakeholder_name: stakeholderName,
+        user_email: userEmail,
+        platform,
+      })
+    });
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function renderRiskBadge(risk) {
+  if (!risk || risk.status !== 'scored') return '';
+  const color = risk.risk_level === 'high' ? '#ef4444'
+    : risk.risk_level === 'medium' ? '#f59e0b' : '#22c55e';
+  return `
+    <div style="background:#10131e;border:1px solid ${color}33;border-left:3px solid ${color};
+                border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:11px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="color:${color};font-weight:600;">${risk.risk_emoji} ${risk.risk_score}% Risk — ${risk.risk_level.toUpperCase()}</span>
+        <span style="color:#3a3f55;font-size:9px;font-family:monospace;">${risk.confidence}% confidence</span>
+      </div>
+      ${risk.explanation ? `<div style="color:#8b8fa8;margin-bottom:4px;">${risk.explanation}</div>` : ''}
+      ${risk.suggestion ? `<div style="color:#6366f1;">💡 ${risk.suggestion}</div>` : ''}
+    </div>`;
+}
+
+function renderInsufficientDataBadge(risk) {
+  if (!risk || risk.status !== 'insufficient_data') return '';
+  return `
+    <div style="background:#10131e;border:1px solid #1e2235;border-radius:6px;
+                padding:8px 12px;margin-bottom:10px;font-size:10px;color:#3a3f55;
+                font-family:monospace;">
+      🔒 ${risk.message}
+    </div>`;
+}
