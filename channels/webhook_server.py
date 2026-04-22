@@ -53,13 +53,37 @@ import secrets as _secrets
 
 def verify_request(request) -> bool:
     import os
+    import base64
+
     # Always allow health check
     if request.url.path == "/api/health":
         return True
-    # Chrome extensions don't send origin headers — allow all extension requests
-    # CORS middleware already blocks browser requests from unknown origins
-    # For beta: allow all requests, log suspicious ones
-    return True
+
+    # Check Bearer token
+    auth = request.headers.get("authorization", "")
+    if auth.startswith("Bearer "):
+        token = auth[7:]
+        try:
+            # Decode token: alterus:email:timestamp
+            decoded = base64.b64decode(token + "==").decode("utf-8")
+            if decoded.startswith("alterus:") and "@" in decoded:
+                return True
+        except Exception:
+            pass
+
+    # Allow requests from known origins (dashboard)
+    origin  = request.headers.get("origin", "")
+    referer = request.headers.get("referer", "")
+    allowed = [
+        "https://app.alterus.io",
+        "https://alterus-app.netlify.app",
+        "http://localhost:3000",
+    ]
+    if any(o in origin or o in referer for o in allowed):
+        return True
+
+    # Block everything else
+    return False
     """Verify request comes from allowed origin or has valid token."""
     if request.url.path == "/api/health":
         return True
