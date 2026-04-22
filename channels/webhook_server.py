@@ -1035,3 +1035,30 @@ async def get_risk_summary(user_email: str = "default", stakeholder_name: str = 
         return get_stakeholder_risk_summary(user_email, stakeholder_name)
     except Exception as e:
         return {"error": str(e)}
+
+# ── Communication Risk Engine ─────────────────────────────────────────────────
+@app.post("/api/risk/analyze")
+async def analyze_communication_risk(request: Request):
+    """Analyze communication risk for a draft before sending."""
+    try:
+        data            = await request.json()
+        draft           = data.get("draft", "")
+        stakeholder     = data.get("stakeholder_name", "")
+        user_email      = data.get("user_email", "default")
+        platform        = data.get("platform", "email")
+
+        from agent.risk_engine import analyze_risk
+        result = analyze_risk(draft, stakeholder, user_email, platform)
+        return result
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
+@app.get("/api/risk/summary")
+async def get_risk_summary(user_email: str = "default", stakeholder_name: str = ""):
+    """Get risk summary for a stakeholder — used in People tab."""
+    try:
+        from agent.risk_engine import get_stakeholder_risk_summary
+        return get_stakeholder_risk_summary(user_email, stakeholder_name)
+    except Exception as e:
+        return {"error": str(e)}
