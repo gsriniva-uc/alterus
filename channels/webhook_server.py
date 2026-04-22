@@ -49,6 +49,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import secrets as _secrets
+
+def verify_request(request) -> bool:
+    """Verify request comes from allowed origin or has valid token."""
+    if request.url.path == "/api/health":
+        return True
+    origin  = request.headers.get("origin", "")
+    referer = request.headers.get("referer", "")
+    allowed = [
+        "https://app.alterus.io",
+        "https://alterus-app.netlify.app",
+        "http://localhost:3000",
+        "chrome-extension://",
+    ]
+    if any(o in origin or o in referer for o in allowed):
+        return True
+    api_secret = os.getenv("ALTERUS_API_SECRET", "")
+    auth = request.headers.get("authorization", "")
+    if auth.startswith("Bearer ") and api_secret:
+        return _secrets.compare_digest(auth[7:], api_secret)
+    if not api_secret:
+        return True
+    return False
+
+
 
 # ── Storage helpers ───────────────────────────────────────────────────────────
 
