@@ -22,3 +22,4 @@ pydantic==2.6.4
 tiktoken==0.6.0
 httpx
 voyageai
+cryptography>=42.0.0
