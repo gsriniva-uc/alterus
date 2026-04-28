@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Alterus \u2014 Your AI Digital Twin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Draft emails and chats in your voice. Works on Gmail, Outlook, Slack, and Teams.",
   "permissions": [
     "storage",
@@ -12,7 +12,9 @@
   "host_permissions": [
     "https://mail.google.com/*",
     "https://outlook.office.com/*",
+    "https://outlook.office365.com/*",
     "https://outlook.live.com/*",
+    "https://outlook.cloud.microsoft/*",
     "https://app.slack.com/*",
     "https://teams.microsoft.com/*",
     "https://*.onrender.com/*",
@@ -20,8 +22,7 @@
     "https://*.streamlit.app/*",
     "https://gmail.googleapis.com/*",
     "https://slack.com/*",
-    "https://app.alterus.io/*",
-    "https://outlook.cloud.microsoft/*"
+    "https://app.alterus.io/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -31,17 +32,14 @@
       "matches": [
         "https://mail.google.com/*",
         "https://outlook.office.com/*",
+        "https://outlook.office365.com/*",
         "https://outlook.live.com/*",
+        "https://outlook.cloud.microsoft/*",
         "https://app.slack.com/*",
-        "https://teams.microsoft.com/*",
-        "https://outlook.cloud.microsoft/*"
+        "https://teams.microsoft.com/*"
       ],
-      "js": [
-        "content.js"
-      ],
-      "css": [
-        "sidebar.css"
-      ],
+      "js": ["content.js"],
+      "css": ["sidebar.css"],
       "run_at": "document_idle"
     },
     {
@@ -49,9 +47,7 @@
         "https://app.alterus.io/*",
         "https://outlook.cloud.microsoft/*"
       ],
-      "js": [
-        "app_bridge.js"
-      ],
+      "js": ["app_bridge.js"],
       "run_at": "document_idle"
     }
   ],
